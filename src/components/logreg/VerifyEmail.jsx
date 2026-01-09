@@ -4,7 +4,7 @@ import api from '../../api/axios';
 
 function VerifyEmail() {
     const [searchParams] = useSearchParams();
-    const [status, setStatus] = useState('verifying'); // 'verifying', 'success', 'error'
+    const [status, setStatus] = useState('verifying'); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,14 +18,11 @@ function VerifyEmail() {
             }
 
             try {
-                // Отправляем GET запрос на ваш бэкенд через прокси
-                // Эндпоинт на бэке: /websec/api/auth/verify-email/
                 await api.get('/auth/verify-email/', {
                     params: { uid, token }
                 });
                 
                 setStatus('success');
-                // Через 3 секунды редиректим на логин
                 setTimeout(() => navigate('/login'), 3000);
             } catch (err) {
                 console.error(err);

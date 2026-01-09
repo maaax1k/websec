@@ -1,8 +1,8 @@
 import cart from '/cart.png'
-import userIcon from '../assets/user.png' // переименовал во избежание конфликта
+import userIcon from '../assets/user.png' 
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
-import api from '../api/axios'; // импорт настроенного axios
+import api from '../api/axios'; 
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +12,7 @@ function Header() {
 
   useEffect(() => {
     const checkAuth = async () => {
-            if (!localStorage.getItem('user')) return;
+            // if (!localStorage.getItem('user')) return;
 
             try {
                 const res = await api.get('/auth/me/');
@@ -55,7 +55,7 @@ function Header() {
           <img src={cart} alt="cart" className="size-8 md:size-10" />
         </Link>
 
-        {/* Если юзер есть — кнопка Выхода, если нет — иконка логина */}
+
         {user ? (
           
           <div className="flex items-center le">
@@ -71,7 +71,6 @@ function Header() {
           </Link>
         )}
 
-        {/* Бургер-меню для мобилок */}
         <button className="lg:hidden p-2" onClick={() => setIsOpen(!isOpen)}>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
@@ -79,7 +78,7 @@ function Header() {
         </button>
       </div>
 
-      {/* Мобильное меню */}
+
       {isOpen && (
         <nav className="absolute top-full left-0 w-full bg-white shadow-md lg:hidden border-t">
           <ul className="flex flex-col gap-4 p-4 text-gray-700 font-medium">

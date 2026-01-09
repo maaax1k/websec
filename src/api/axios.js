@@ -4,6 +4,8 @@ const api = axios.create({
     // Теперь baseURL — это относительный путь вашего же сайта
     baseURL: '/websec', 
     withCredentials: true, // Обязательно для передачи кук
+    xsrfCookieName: 'csrftoken',
+    xsrfHeaderName: 'X-CSRFToken',
 });
 
 // Перехватчик ответов

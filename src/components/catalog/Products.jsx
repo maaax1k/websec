@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../api/axios'
 
-function Products({ products, isLoading }) { // Добавляем проп isLoading
+function Products({ products, isLoading }) { 
     const [selectedPage, setSelectedPage] = useState(1)
     const [productsSliced, setProductsSliced] = useState(() => (products ? products.slice(0, 20) : []))
-    const [addingId, setAddingId] = useState(null); // хранит ID товара, который в процессе добавления
+    const [addingId, setAddingId] = useState(null); 
     const addToCart = async (productId) => {
-        setAddingId(productId); // Включаем режим "Загрузка" для конкретной кнопки
+        setAddingId(productId);
 
         try {
             const response = await api.post('/cart-items/', {
@@ -49,7 +49,7 @@ function Products({ products, isLoading }) { // Добавляем проп isLo
         setProductsSliced(() => (products ? products.slice(0, 20) : []))
     }, [products])
 
-    // Компонент скелетона для одной карточки
+
     const ProductSkeleton = () => (
         <div className='rounded-lg p-3 animate-pulse'>
             <div className='w-full aspect-square bg-neutral-200 rounded-md'></div>
@@ -74,7 +74,6 @@ function Products({ products, isLoading }) { // Добавляем проп isLo
 
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
                 {isLoading ? (
-                    // Показываем 8 скелетонов во время загрузки
                     Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
                 ) : (
                     productsSliced.map((prod, index) => (
@@ -121,8 +120,6 @@ function Products({ products, isLoading }) { // Добавляем проп isLo
                     ))
                 )}
             </div>
-
-            {/* Пагинация (скрываем при загрузке) */}
             {!isLoading && pageNumber > 1 && (
                 <div className='flex justify-center items-center mt-8'>
                     <ul className='flex gap-2 flex-wrap justify-center'>

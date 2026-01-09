@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios';
+
 
 function User() {
     useEffect(() => {
@@ -21,8 +22,8 @@ function User() {
         } catch (err) {
             console.error("Logout error", err);
         }
-        finally{
-            window.location.reload(); // Чтобы Header обновил состояние
+        finally {
+            window.location.reload();
         }
     };
     const getUserData = async () => {
@@ -49,7 +50,7 @@ function User() {
                 first_name: editForm.first_name,
                 last_name: editForm.last_name
             });
-            setUserData(res.data); // Обновляем данные в UI
+            setUserData(res.data); 
             setIsEditing(false);
         } catch (err) {
             console.error("Ошибка при обновлении:", err);
@@ -57,7 +58,7 @@ function User() {
         } finally {
             setIsSaving(false);
             getUserData();
-            window.location.reload(); // Чтобы Header обновил состояние
+            window.location.reload(); 
         }
     };
 
@@ -88,7 +89,7 @@ function User() {
     return (
         <div className="min-h-[80vh] bg-gray-100 flex items-center justify-center p-4">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden">
-                {/* Header */}
+
                 <div className="bg-neutral-800 p-6">
                     <div className="flex items-center space-x-4">
                         <div className="h-16 w-16 bg-neutral-200 rounded-full flex items-center justify-center text-neutral-700 text-2xl font-bold uppercase">
@@ -103,9 +104,9 @@ function User() {
                     </div>
                 </div>
 
-                {/* Content */}
+
                 <div className="p-6 space-y-6">
-                    {/* First Name */}
+
                     <div>
                         <label className="block text-sm font-medium text-gray-500 uppercase tracking-wider">Имя</label>
                         {isEditing ? (
@@ -122,7 +123,6 @@ function User() {
                         )}
                     </div>
 
-                    {/* Last Name */}
                     <div>
                         <label className="block text-sm font-medium text-gray-500 uppercase tracking-wider">Фамилия</label>
                         {isEditing ? (
@@ -139,7 +139,6 @@ function User() {
                         )}
                     </div>
 
-                    {/* Email (Read Only) */}
                     <div>
                         <label className="block text-sm font-medium text-gray-500 uppercase tracking-wider">Email адрес</label>
                         <p className="mt-1 text-lg text-yellow-600 font-medium border-b border-gray-100 pb-2 opacity-70">
@@ -147,7 +146,6 @@ function User() {
                         </p>
                     </div>
 
-                    {/* Buttons */}
                     <div className="pt-4 space-y-3">
                         {isEditing ? (
                             <>
@@ -169,20 +167,32 @@ function User() {
                                 </button>
                             </>
                         ) : (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="w-full cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md"
-                            >
-                                Редактировать
-                            </button>
+                            <>
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="w-full cursor-pointer bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md"
+                                >
+                                    Редактировать профиль
+                                </button>
+
+                                <Link
+                                    to="/orders"
+                                    className="w-full flex items-center justify-center space-x-2 bg-white border-2 border-neutral-800 text-neutral-800 hover:bg-neutral-50 font-bold py-3 px-4 rounded-xl transition duration-200 shadow-sm"
+                                >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    <span>Мои заказы</span>
+                                </Link>
+                            </>
                         )}
+
                         <button
                             onClick={handleLogout}
                             className="w-full cursor-pointer bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-md"
                         >
                             Logout
                         </button>
-
                     </div>
                 </div>
             </div>

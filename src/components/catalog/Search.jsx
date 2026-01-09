@@ -183,11 +183,10 @@ function Search({ currentSearch, currentFilter }) {
                     </button>
                 )}
 
-                {/* Теги */}
                 <div className="flex flex-wrap gap-3 items-center min-h-[40px]">
 
                     <div className="flex flex-wrap gap-2">
-                        {/* Тег Поиска */}
+
                         {currentSearch.searchTerm && (
                             <span className="flex items-center gap-2 px-3 py-1.5 bg-neutral-900 text-white rounded-lg text-xs font-medium">
                                 <span>Поиск: {currentSearch.searchTerm}</span>
@@ -200,7 +199,6 @@ function Search({ currentSearch, currentFilter }) {
                             </span>
                         )}
 
-                        {/* Тег Категории */}
                         {currentFilter.filter.category && (
                             <span className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-800 rounded-lg text-xs font-medium border border-neutral-200">
                                 <span>Категория: {categories.find(c => c.id == currentFilter.filter.category)?.name || 'Выбрано'}</span>
@@ -227,7 +225,6 @@ function Search({ currentSearch, currentFilter }) {
                             </span>
                         )}
 
-                        {/* Тег Цены */}
                         {(currentFilter.filter.minPrice || currentFilter.filter.maxPrice) && (
                             <span className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-800 rounded-lg text-xs font-medium border border-neutral-200">
                                 <span>Цена: {currentFilter.filter.minPrice || 0} — {currentFilter.filter.maxPrice || '∞'} $</span>
@@ -244,7 +241,6 @@ function Search({ currentSearch, currentFilter }) {
                             </span>
                         )}
 
-                        {/* Тег Сортировки */}
                         {currentFilter.filter.ordering && (
                             <span className="flex items-center gap-2 px-3 py-1.5 bg-neutral-100 text-neutral-800 rounded-lg text-xs font-medium border border-neutral-200">
                                 <span>Сортировка: {

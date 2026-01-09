@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../../api/axios'; // импорт созданного axios
+import api from '../../api/axios';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -21,9 +21,8 @@ function Login() {
             localStorage.setItem('user', JSON.stringify(response.data.user));
 
             setIsLoggingIn(false);
-            setIsSuccess(true); // Включаем состояние успеха
+            setIsSuccess(true);
 
-            // Небольшая пауза перед редиректом, чтобы пользователь увидел "Success"
             setTimeout(() => {
                 navigate('/');
                 window.location.reload();

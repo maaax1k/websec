@@ -17,7 +17,7 @@ function Catalog() {
             
             if (searchTerm) params.append('search', searchTerm);
             if (filter.category) params.append('category', filter.category);
-            if (filter.brand) params.append('brand', filter.brand); // ДОБАВЛЕНО
+            if (filter.brand) params.append('brand', filter.brand);
             if (filter.minPrice) params.append('price_min', filter.minPrice);
             if (filter.maxPrice) params.append('price_max', filter.maxPrice);
             if (filter.ordering) params.append('ordering', filter.ordering);
