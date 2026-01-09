@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios'; // импорт созданного axios
 
 function Login() {
@@ -8,16 +8,29 @@ function Login() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoggingIn(true);
+        setError('');
+
         try {
             const response = await api.post('/auth/login/', { email, password });
             localStorage.setItem('user', JSON.stringify(response.data.user));
-            
-            alert('Успешный вход!');
-            navigate('/');
-            window.location.reload(); // Чтобы Header обновил состояние
+
+            setIsLoggingIn(false);
+            setIsSuccess(true); // Включаем состояние успеха
+
+            // Небольшая пауза перед редиректом, чтобы пользователь увидел "Success"
+            setTimeout(() => {
+                navigate('/');
+                window.location.reload();
+            }, 800);
+
         } catch (err) {
+            setIsLoggingIn(false);
             setError(err.response?.data?.detail || 'Ошибка при входе');
         }
     };
@@ -48,9 +61,36 @@ function Login() {
                             required
                         />
                     </div>
-                    <button type="submit" className="w-full bg-neutral-800 text-white py-2 rounded-xl">
-                        Sign In
+                    <button
+                        type="submit"
+                        disabled={isLoggingIn || isSuccess}
+                        className={`
+        w-full py-3 rounded-xl uppercase tracking-widest text-sm transition-all duration-300
+        ${isSuccess
+                                ? 'bg-green-600 text-white'
+                                : 'bg-neutral-800 hover:bg-black text-white active:scale-[0.99] disabled:opacity-70'
+                            }
+    `}
+                    >
+                        <div className="flex items-center justify-center gap-2">
+                            {isLoggingIn ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                    <span>Checking...</span>
+                                </>
+                            ) : isSuccess ? (
+                                <>
+                                    <svg className="w-5 h-5 animate-bounceSmall" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Welcome back</span>
+                                </>
+                            ) : (
+                                "Sign In"
+                            )}
+                        </div>
                     </button>
+                    <Link className='w-full text-center block text-yellow-600' to='/registration'>Sign Up</Link>
                 </form>
             </div>
         </div>

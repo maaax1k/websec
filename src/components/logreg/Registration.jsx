@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../../api/axios';
+import {Link} from 'react-router-dom'
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -57,6 +58,7 @@ function Register() {
           <button type="submit" className="w-full bg-neutral-800 text-white py-2 rounded-xl">
             Sign Up
           </button>
+          <Link className='w-full text-center block text-yellow-600' to='/login'>Sign In</Link>
         </form>
       </div>
     </div>
