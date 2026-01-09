@@ -1,0 +1,174 @@
+import React, { useEffect, useState } from 'react';
+import api from '../../api/axios';
+import { Link } from 'react-router-dom';
+
+function Cart() {
+    const [cartItems, setCartItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+        fetchCart();
+    }, []);
+
+    const fetchCart = async () => {
+        try {
+            const res = await api.get('/cart-items/');
+            setCartItems(res.data);
+        } catch (err) {
+            console.error("Ошибка загрузки корзины", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Оптимизированное удаление
+    const removeItem = async (id) => {
+        // 1. Сохраняем копию на случай ошибки
+        const previousItems = [...cartItems];
+
+        // 2. Мгновенно обновляем UI
+        setCartItems(prev => prev.filter(item => item.id !== id));
+
+        try {
+            await api.delete(`/cart-items/${id}/`);
+        } catch (err) {
+            // 3. Если ошибка — возвращаем как было
+            console.error("Не удалось удалить", err);
+            setCartItems(previousItems);
+            alert("Ошибка при удалении товара");
+        }
+    };
+
+    // Оптимизированное изменение количества
+    const updateQuantity = async (id, newQty) => {
+        if (newQty < 1) return;
+
+        const previousItems = [...cartItems];
+
+        // 1. Мгновенно меняем состояние в UI
+        setCartItems(prev => prev.map(item =>
+            item.id === id ? {
+                ...item,
+                quantity: newQty,
+                total_item_price: (parseFloat(item.unit_price) * newQty).toString()
+            } : item
+        ));
+
+        try {
+            // 2. Отправляем запрос в фоне
+            await api.patch(`/cart-items/${id}/`, { quantity: newQty });
+        } catch (err) {
+            // 3. Откат при ошибке
+            console.error("Ошибка обновления", err);
+            setCartItems(previousItems);
+        }
+    };
+
+    const totalPrice = cartItems.reduce((sum, item) => sum + parseFloat(item.total_item_price), 0);
+
+    if (isLoading) return (
+        <div className='flex justify-center items-center my-40'>
+            <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neutral-900'></div>
+        </div>
+    );
+
+    return (
+        <div className="mx-[10%] my-12 text-neutral-800 animate-fadeIn">
+            <h1 className="text-4xl font-black mb-10 tracking-tighter">Shopping Cart</h1>
+
+            {cartItems.length === 0 ? (
+                <div className="bg-neutral-50 rounded-3xl p-20 text-center border border-dashed border-neutral-200">
+                    <p className="text-neutral-400 mb-8 uppercase tracking-[0.2em] text-sm font-bold">Корзина пуста</p>
+                    <Link to="/catalog" className="inline-block bg-neutral-900 text-white px-10 py-4 rounded-full font-bold hover:bg-neutral-800 transition-all uppercase text-[10px] tracking-widest shadow-lg">
+                        Go Shopping
+                    </Link>
+                </div>
+            ) : (
+                <div className="flex flex-col lg:flex-row gap-12">
+                    <div className="flex-1 space-y-6">
+                        {cartItems.map((item) => (
+                            <div key={item.id} className="group relative bg-white rounded-3xl p-5 flex flex-col md:flex-row items-center gap-8 shadow-sm border border-neutral-100 hover:shadow-md transition-all">
+
+                                <div className="relative w-32 h-40 shrink-0 overflow-hidden rounded-2xl bg-neutral-100">
+                                    <img
+                                        src={item.product.images[0]?.image || 'https://via.placeholder.com/150'}
+                                        alt={item.product.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                </div>
+
+                                <div className="flex-1 w-full">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
+                                                {item.product.brand.name}
+                                            </span>
+                                            <h3 className="font-bold text-lg uppercase tracking-tight mt-1 leading-tight">{item.product.name}</h3>
+                                        </div>
+
+                                        <button
+                                            onClick={() => removeItem(item.id)}
+                                            className="text-neutral-300 hover:text-black transition-colors p-2"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center justify-between mt-8">
+                                        {/* Контроллер количества */}
+                                        <div className="flex items-center bg-neutral-50 rounded-full border border-neutral-100 p-1">
+                                            <button
+                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-black hover:bg-white rounded-full transition-all"
+                                            >–</button>
+                                            <span className="px-4 text-sm w-10 text-center">{item.quantity}</span>
+                                            <button
+                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                className="w-8 h-8 flex items-center justify-center text-neutral-400 hover:text-black hover:bg-white rounded-full transition-all"
+                                            >+</button>
+                                        </div>
+
+                                        <div className="text-right">
+                                            <p className="text-yellow-600 font-bold text-xl tracking-tight">{Math.round(item.total_item_price).toLocaleString()} ₸</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Summary Panel */}
+                    <div className="lg:w-[380px]">
+                        <div className="bg-neutral-900 text-white rounded-[2.5rem] p-10 sticky top-25 shadow-2xl">
+                            <h2 className="text-2xl font-bold tracking-tighter mb-8 border-b border-neutral-800 pb-6">Checkout</h2>
+
+                            <div className="space-y-4 mb-10">
+                                <div className="flex justify-between text-neutral-500 uppercase text-[10px] font-bold tracking-widest">
+                                    <span>Subtotal</span>
+                                    <span className="text-white">{totalPrice.toLocaleString()} ₸</span>
+                                </div>
+                                <div className="flex justify-between text-neutral-500 uppercase text-[10px] font-bold tracking-widest">
+                                    <span>Shipping</span>
+                                    <span className="text-green-400 font-black">Free</span>
+                                </div>
+                                <div className="pt-6 border-t border-neutral-800 flex justify-between items-end">
+                                    <span className="text-neutral-400 uppercase text-[10px] font-bold tracking-widest">Total</span>
+                                    <span className="text-3xl font-black tracking-tighter">{totalPrice.toLocaleString()} ₸</span>
+                                </div>
+                            </div>
+
+                            <button className="w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:invert transition-all active:scale-95 shadow-xl">
+                                Pay Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default Cart;
