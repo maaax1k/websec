@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect } from 'react'
 import './App.css'
 import api from './api/axios'
 import Header from './components/Header'
@@ -16,29 +14,32 @@ import ProductDetail from './components/product/ProductDetail'
 import ContactUs from './components/contact/ContactUs'
 import Cart from './components/cart/Cart'
 import Orders from './components/orders/Orders'
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 function App() {
   useEffect(() => {
-    api.get('/auth/csrf/'); 
-}, []);
+    api.get('/auth/csrf/');
+  }, []);
   return (
     <div className='mt-30'>
-      <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path='/' element={<Main/>}/>
-          <Route path='/catalog' element={<Catalog/>}/>
-          <Route path='/login' element={<Login/>}/>
-          <Route path='/registration' element={<Registration/>}/>
-          <Route path='/verify-email' element={<VerifyEmail/>}/>
-          <Route path='/user' element={<User/>}/>
-          <Route path='/product/:id' element={<ProductDetail/>}/>
-          <Route path='/contacts' element={<ContactUs/>}/>
-          <Route path='/cart' element={<Cart/>}/>
-          <Route path='/orders' element={<Orders/>}/>
-        </Routes>
-        <Footer />
-      </BrowserRouter>
+      <GoogleReCaptchaProvider reCaptchaKey="6LdrV0YsAAAAAG4Bh_QZZYNZlbJaJspHLLCjIFvE">
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path='/' element={<Main />} />
+            <Route path='/catalog' element={<Catalog />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/registration' element={<Registration />} />
+            <Route path='/verify-email' element={<VerifyEmail />} />
+            <Route path='/user' element={<User />} />
+            <Route path='/product/:id' element={<ProductDetail />} />
+            <Route path='/contacts' element={<ContactUs />} />
+            <Route path='/cart' element={<Cart />} />
+            <Route path='/orders' element={<Orders />} />
+          </Routes>
+          <Footer />
+        </BrowserRouter>
+      </GoogleReCaptchaProvider>
     </div>
   )
 }

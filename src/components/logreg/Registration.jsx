@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'; // Импортируем хук
 import api from '../../api/axios';
-import { Link } from 'react-router-dom'
+
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -9,22 +11,29 @@ function Register() {
     email: '',
     password: ''
   });
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    setLoading(true); 
+    if (!executeRecaptcha) return;
+
+    setLoading(true);
     try {
-      const response = await api.post('/auth/register/', formData);
+      const token = await executeRecaptcha('register_page');
+      const response = await api.post('/auth/register/', {
+        ...formData,
+        re_captcha_token: token
+      });
+
       setMessage(response.data.detail);
     } catch (err) {
-      const errors = err.response?.data;
-      setMessage(errors ? Object.values(errors).join(' ') : 'Ошибка регистрации');
+      setMessage('Ошибка');
     } finally {
       setLoading(false);
     }
-  };
+  }, [executeRecaptcha, formData]);
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center">
@@ -61,7 +70,7 @@ function Register() {
           />
           <button
             type="submit"
-            disabled={loading} 
+            disabled={loading}
             className={`w-full py-2 rounded-xl transition-all duration-200 flex items-center justify-center space-x-2
     ${loading
                 ? 'bg-neutral-500 cursor-not-allowed'
