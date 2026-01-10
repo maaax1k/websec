@@ -15,25 +15,40 @@ function Register() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = useCallback(async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!executeRecaptcha) return;
+
+    if (!executeRecaptcha) {
+      setMessage("Капча еще инициализируется...");
+      return;
+    }
 
     setLoading(true);
     try {
+      // 1. Пытаемся получить токен
       const token = await executeRecaptcha('register_page');
-      const response = await api.post('/auth/register/', {
+
+      if (!token) {
+        throw new Error("Google не вернул токен. Проверьте Site Key и Домены.");
+      }
+
+      // 2. Явно собираем объект для отправки
+      const dataToSend = {
         ...formData,
         re_captcha_token: token
-      });
+      };
 
+      console.log("Отправляем данные:", dataToSend); // Проверьте консоль перед запросом
+
+      const response = await api.post('/auth/register/', dataToSend);
       setMessage(response.data.detail);
     } catch (err) {
-      setMessage('Ошибка');
+      console.error("Ошибка:", err);
+      setMessage(err.response?.data?.detail || "Произошла ошибка");
     } finally {
       setLoading(false);
     }
-  }, [executeRecaptcha, formData]);
+  };
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center">
