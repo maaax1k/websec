@@ -14,18 +14,34 @@ function ProductDetail() {
     const handleAddToCart = async () => {
         setIsAdding(true);
         try {
+            // 1. Получаем данные пользователя из хранилища
+            const storedUser = localStorage.getItem('user');
+
+            // 2. Проверяем наличие данных
+            if (!storedUser) {
+                console.error("Пользователь не авторизован");
+                setIsAdding(false);
+                // Тут можно добавить navigate('/login') или уведомление
+                return;
+            }
+
+            // 3. Достаем cartId
+            const { cartId } = JSON.parse(storedUser);
+
+            // 4. Делаем запрос с динамическим ID
             const response = await api.post('/cart-items/', {
-                cart: 2,
+                cart: cartId, // Подставляем ID из памяти
                 product_id: product.id,
                 quantity: 1
             });
+
             if (response.status === 201) {
                 setIsAdding(false);
                 setIsSuccess(true);
                 setTimeout(() => setIsSuccess(false), 2000);
             }
         } catch (err) {
-            console.error(err);
+            console.error("Ошибка при добавлении в корзину:", err);
             setIsAdding(false);
         }
     };

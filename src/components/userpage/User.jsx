@@ -29,8 +29,19 @@ function User() {
     const getUserData = async () => {
         try {
             const res = await api.get('/auth/me/');
-            setUserData(res.data);
-            setEditForm({ first_name: res.data.first_name, last_name: res.data.last_name });
+
+            const { user, cart } = res.data;
+            const finalUserData = {
+                ...user,
+                cartId: cart.id
+            };
+
+            setUserData(finalUserData);
+            setEditForm({
+                first_name: user.first_name,
+                last_name: user.last_name
+            });
+
             setIsLoading(false);
         } catch (err) {
             if (err.response?.status === 401) {
@@ -39,6 +50,7 @@ function User() {
             setIsLoading(false);
         }
     };
+
     useEffect(() => {
         getUserData();
     }, [navigate]);
@@ -50,7 +62,7 @@ function User() {
                 first_name: editForm.first_name,
                 last_name: editForm.last_name
             });
-            setUserData(res.data); 
+            setUserData(res.data);
             setIsEditing(false);
         } catch (err) {
             console.error("Ошибка при обновлении:", err);
@@ -58,7 +70,7 @@ function User() {
         } finally {
             setIsSaving(false);
             getUserData();
-            window.location.reload(); 
+            window.location.reload();
         }
     };
 

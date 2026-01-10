@@ -2,29 +2,40 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../api/axios'
 
-function Products({ products, isLoading }) { 
+function Products({ products, isLoading }) {
     const [selectedPage, setSelectedPage] = useState(1)
     const [productsSliced, setProductsSliced] = useState(() => (products ? products.slice(0, 20) : []))
-    const [addingId, setAddingId] = useState(null); 
+    const [addingId, setAddingId] = useState(null);
     const addToCart = async (productId) => {
         setAddingId(productId);
 
         try {
+            // 1. Достаем данные пользователя из localStorage
+            const storedUser = localStorage.getItem('user');
+
+            // 2. Проверяем, есть ли данные, и извлекаем cartId
+            if (!storedUser) {
+                console.error("Пользователь не авторизован");
+                return;
+            }
+
+            const { cartId } = JSON.parse(storedUser);
+
+            // 3. Отправляем запрос с динамическим cartId
             const response = await api.post('/cart-items/', {
-                cart: 2,
+                cart: cartId, // Используем полученный ID
                 product_id: productId,
                 quantity: 1
             });
 
             if (response.status === 201) {
                 setAddingId('success-' + productId);
-
                 setTimeout(() => {
                     setAddingId(null);
                 }, 1000);
             }
         } catch (err) {
-            console.error("Ошибка:", err);
+            console.error("Ошибка при добавлении в корзину:", err);
             setAddingId('error-' + productId);
             setTimeout(() => setAddingId(null), 2000);
         }
@@ -90,29 +101,29 @@ function Products({ products, isLoading }) {
                                 </div>
                                 <div className='flex flex-col items-center justify-center'>
                                     <button
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                if (!addingId) addToCart(prod.id);
-                                            }}
-                                            className={`
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (!addingId) addToCart(prod.id);
+                                        }}
+                                        className={`
                                                         relative rounded-lg px-2 py-1.5 text-xs transition-all duration-300 
                                                         cursor-pointer flex items-center justify-center gap-2 uppercase mx-2 tracking-wider z-20 min-w-[85px]
                                                         ${addingId === 'success-' + prod.id ? 'bg-green-600 text-white' :
-                                                                                                    addingId === 'error-' + prod.id ? 'bg-red-600 text-white' :
-                                                                                                        'bg-neutral-800 text-white hover:bg-black active:scale-95'}
+                                                addingId === 'error-' + prod.id ? 'bg-red-600 text-white' :
+                                                    'bg-neutral-800 text-white hover:bg-black active:scale-95'}
                                                     `}
-                                        >
-                                            {addingId === prod.id ? (
-                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                            ) : addingId === 'success-' + prod.id ? (
-                                                <span className="flex items-center gap-1">DONE ✓</span>
-                                            ) : addingId === 'error-' + prod.id ? (
-                                                <span>ERR!</span>
-                                            ) : (
-                                                <span>+ cart</span>
-                                            )}
-                                        </button>
+                                    >
+                                        {addingId === prod.id ? (
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        ) : addingId === 'success-' + prod.id ? (
+                                            <span className="flex items-center gap-1">DONE ✓</span>
+                                        ) : addingId === 'error-' + prod.id ? (
+                                            <span>ERR!</span>
+                                        ) : (
+                                            <span>+ cart</span>
+                                        )}
+                                    </button>
                                     <p className='text-yellow-600 mt-2'>{prod.price}&nbsp;tg.</p>
                                 </div>
                             </div>
@@ -128,8 +139,8 @@ function Products({ products, isLoading }) {
                                 key={page}
                                 onClick={() => handleSelectPage(page)}
                                 className={`px-4 py-2 rounded-lg cursor-pointer transition-all font-medium ${selectedPage === page
-                                        ? 'bg-neutral-800 text-white shadow-md'
-                                        : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
+                                    ? 'bg-neutral-800 text-white shadow-md'
+                                    : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
                                     }`}
                             >
                                 {page}

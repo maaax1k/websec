@@ -12,19 +12,30 @@ function Header() {
 
   useEffect(() => {
     const checkAuth = async () => {
-            // if (!localStorage.getItem('user')) return;
+        try {
+            const res = await api.get('/auth/me/');
+            
+            // Вытаскиваем данные из ответа:
+            // Сначала берем вложенный объект user и id из объекта cart
+            const { user, cart } = res.data;
 
-            try {
-                const res = await api.get('/auth/me/');
-                setUser(res.data);
-                localStorage.setItem('user', JSON.stringify(res.data));
-            } catch (err) {
-                if (err.response?.status === 401) {
-                    setUser(null);
-                    localStorage.removeItem('user');
-                }
+            // Формируем новый плоский объект
+            const userData = {
+                ...user,      // разворачиваем id, first_name, email и т.д.
+                cartId: cart.id // сохраняем только ID корзины
+            };
+
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+
+        } catch (err) {
+            if (err.response?.status === 401) {
+                setUser(null);
+                localStorage.removeItem('user');
             }
-        };
+        }
+    };
+
     checkAuth();
 
     const onScroll = () => setScrolled(window.scrollY > 10);

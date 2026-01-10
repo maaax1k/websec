@@ -9,25 +9,35 @@ function MiniCatalog() {
     const [itemsPerSlide, setItemsPerSlide] = useState(4)
     const [addingId, setAddingId] = useState(null); // хранит ID товара, который в процессе добавления
     const addToCart = async (productId) => {
-        setAddingId(productId); // Включаем режим "Загрузка" для конкретной кнопки
+        setAddingId(productId);
 
         try {
+            // 1. Достаем данные пользователя из localStorage
+            const storedUser = localStorage.getItem('user');
+
+            // 2. Проверяем, есть ли данные, и извлекаем cartId
+            if (!storedUser) {
+                console.error("Пользователь не авторизован");
+                return;
+            }
+
+            const { cartId } = JSON.parse(storedUser);
+
+            // 3. Отправляем запрос с динамическим cartId
             const response = await api.post('/cart-items/', {
-                cart: 2,
+                cart: cartId, // Используем полученный ID
                 product_id: productId,
                 quantity: 1
             });
 
             if (response.status === 201) {
-                // Вместо alert меняем состояние на "Успех"
                 setAddingId('success-' + productId);
-
                 setTimeout(() => {
                     setAddingId(null);
                 }, 1000);
             }
         } catch (err) {
-            console.error("Ошибка:", err);
+            console.error("Ошибка при добавлении в корзину:", err);
             setAddingId('error-' + productId);
             setTimeout(() => setAddingId(null), 2000);
         }
@@ -130,8 +140,8 @@ function MiniCatalog() {
                                                         relative rounded-lg px-2 py-1.5 text-xs transition-all duration-300 
                                                         cursor-pointer flex items-center justify-center gap-2 uppercase mx-2 tracking-wider z-20 min-w-[85px]
                                                         ${addingId === 'success-' + item.id ? 'bg-green-600 text-white' :
-                                                                                                    addingId === 'error-' + item.id ? 'bg-red-600 text-white' :
-                                                                                                        'bg-neutral-800 text-white hover:bg-black active:scale-95'}
+                                                    addingId === 'error-' + item.id ? 'bg-red-600 text-white' :
+                                                        'bg-neutral-800 text-white hover:bg-black active:scale-95'}
                                                     `}
                                         >
                                             {addingId === item.id ? (
