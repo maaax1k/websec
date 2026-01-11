@@ -15,6 +15,7 @@ import ContactUs from './components/contact/ContactUs'
 import Cart from './components/cart/Cart'
 import Orders from './components/orders/Orders'
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import { AuthProvider,useAuth } from './context/AuthContext';
 
 // App.js
 function App() {
