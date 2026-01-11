@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api, { setAccessToken } from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
 
 function Login() {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -14,23 +16,16 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoggingIn(true);
-        setError('');
-
         try {
             const response = await api.post('/auth/login/', { email, password });
-            setAccessToken(response.data.access);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            setIsLoggingIn(false);
+            login(response.data);
+
             setIsSuccess(true);
-
-            setTimeout(() => {
-                navigate('/');
-                window.location.reload();
-            }, 800);
-
+            setTimeout(() => navigate('/'), 800);
         } catch (err) {
+            setError(err.response?.data?.detail || 'Ошибка');
+        } finally {
             setIsLoggingIn(false);
-            setError(err.response?.data?.detail || 'Ошибка при входе');
         }
     };
 
