@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../../api/axios';
+import api, { setAccessToken } from '../../api/axios';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -18,8 +18,8 @@ function Login() {
 
         try {
             const response = await api.post('/auth/login/', { email, password });
+            setAccessToken(response.data.access);
             localStorage.setItem('user', JSON.stringify(response.data.user));
-
             setIsLoggingIn(false);
             setIsSuccess(true);
 
@@ -91,7 +91,7 @@ function Login() {
                     </button>
                     <Link className='w-full text-center block text-yellow-600' to='/registration'>Sign Up</Link>
                 </form>
-            </div>
+            </div>a
         </div>
     );
 }

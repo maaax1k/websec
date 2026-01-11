@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../../api/axios';
+import api, { setAccessToken } from '../../api/axios';
 
 
 function User() {
@@ -15,17 +15,19 @@ function User() {
     const [userData, setUserData] = useState({ id: '', first_name: '', last_name: '', email: '' });
     const [editForm, setEditForm] = useState({ first_name: '', last_name: '' });
     const handleLogout = async () => {
-        try {
-            await api.post('/auth/logout/');
-            localStorage.removeItem('user');
-            navigate('/login');
-        } catch (err) {
-            console.error("Logout error", err);
-        }
-        finally {
-            window.location.reload();
-        }
-    };
+    try {
+        await api.post('/auth/logout/');
+    } catch (err) {
+        console.error("Logout error", err);
+    } finally {
+        setAccessToken(null);
+        localStorage.removeItem('user');
+        navigate('/login');
+        // Reload можно оставить, если хочешь гарантированно сбросить 
+        // состояние всех компонентов, но с setAccessToken(null) это уже не обязательно
+        // window.location.reload(); 
+    }
+};
     const getUserData = async () => {
         try {
             const res = await api.get('/auth/me/');

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import api from './api/axios'
 import Header from './components/Header'
@@ -17,9 +17,31 @@ import Orders from './components/orders/Orders'
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    api.get('/auth/csrf/');
+    const initializeApp = async () => {
+      try {
+        const response = await api.post('/auth/refresh/');
+        setAccessToken(response.data.access);
+      } catch (err) {
+        console.log("No active session.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeApp();
   }, []);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-neutral-200 border-t-neutral-800 rounded-full animate-spin"></div>
+          <p className="text-neutral-500 font-medium animate-pulse">Loading App...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className='mt-30'>
       <GoogleReCaptchaProvider reCaptchaKey="6LdrV0YsAAAAAG4Bh_QZZYNZlbJaJspHLLCjIFvE">
