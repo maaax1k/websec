@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import api from '../../api/axios'
 
 function Search({ currentSearch, currentFilter }) {
-    // Локальные состояния для полей ввода (чтобы не спамить запросами при каждом символе)
     const [localSearch, setLocalSearch] = useState(currentSearch.searchTerm)
     const [minPrice, setMinPrice] = useState(currentFilter.filter.minPrice)
     const [maxPrice, setMaxPrice] = useState(currentFilter.filter.maxPrice)
@@ -11,14 +10,12 @@ function Search({ currentSearch, currentFilter }) {
     const [brand, setBrand] = useState(currentFilter.filter.brand || '')
     const [brands, setBrands] = useState([])
 
-    // Состояние для списка категорий с сервера
     const [categories, setCategories] = useState([])
 
-    // Загружаем категории один раз при монтировании
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await api.get('/categories/') // Уточни эндпоинт категорий
+                const res = await api.get('/categories/')
                 setCategories(res.data)
             } catch (err) {
                 console.error("Не удалось загрузить категории", err)
@@ -29,7 +26,7 @@ function Search({ currentSearch, currentFilter }) {
             try {
                 const [catRes, brandRes] = await Promise.all([
                     api.get('/categories/'),
-                    api.get('/brands/') // Предполагаемый эндпоинт для брендов
+                    api.get('/brands/') 
                 ]);
                 setCategories(catRes.data);
                 setBrands(brandRes.data);
@@ -41,7 +38,6 @@ function Search({ currentSearch, currentFilter }) {
         fetchCategories()
     }, [])
 
-    // Функция применения всех фильтров
     const handleApplyFilters = () => {
         currentSearch.setSearchTerm(localSearch)
         currentFilter.setFilter({
@@ -56,7 +52,6 @@ function Search({ currentSearch, currentFilter }) {
         if (e.key === 'Enter') handleApplyFilters()
     }
 
-    // Очистка
     const clearAll = () => {
         setLocalSearch(''); setMinPrice(''); setMaxPrice('');
         setCategory(''); setBrand(''); setOrdering('');
@@ -66,7 +61,7 @@ function Search({ currentSearch, currentFilter }) {
 
     return (
         <div className="p-6 border-b border-neutral-100">
-            {/* Строка поиска */}
+
             <div className="mb-6 flex flex-col md:flex-row gap-3">
                 <div className="relative flex-1">
                     <input
@@ -93,8 +88,6 @@ function Search({ currentSearch, currentFilter }) {
                     Найти
                 </button>
             </div>
-
-            {/* Сетка фильтров */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                 <div>
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-2 ml-1">Бренд</label>
@@ -109,7 +102,7 @@ function Search({ currentSearch, currentFilter }) {
                         ))}
                     </select>
                 </div>
-                {/* Категория */}
+
                 <div>
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-2 ml-1">Категория</label>
                     <select
@@ -124,7 +117,6 @@ function Search({ currentSearch, currentFilter }) {
                     </select>
                 </div>
 
-                {/* Цена ОТ */}
                 <div>
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-2 ml-1">Цена от</label>
                     <input
@@ -136,7 +128,6 @@ function Search({ currentSearch, currentFilter }) {
                     />
                 </div>
 
-                {/* Цена ДО */}
                 <div>
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-2 ml-1">Цена до</label>
                     <input
@@ -148,7 +139,6 @@ function Search({ currentSearch, currentFilter }) {
                     />
                 </div>
 
-                {/* Сортировка */}
                 <div>
                     <label className="block text-[10px] uppercase tracking-widest font-bold text-neutral-400 mb-2 ml-1">Сортировка</label>
                     <select
@@ -164,8 +154,6 @@ function Search({ currentSearch, currentFilter }) {
                     </select>
                 </div>
             </div>
-
-            {/* Активные фильтры (теги) */}
             <div className="flex flex-wrap gap-2 items-center">
                 <button
                     onClick={handleApplyFilters}

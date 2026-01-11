@@ -14,15 +14,12 @@ function Header() {
     const checkAuth = async () => {
         try {
             const res = await api.get('/auth/me/');
-            
-            // Вытаскиваем данные из ответа:
-            // Сначала берем вложенный объект user и id из объекта cart
+
             const { user, cart } = res.data;
 
-            // Формируем новый плоский объект
             const userData = {
-                ...user,      // разворачиваем id, first_name, email и т.д.
-                cartId: cart.id // сохраняем только ID корзины
+                ...user, 
+                cartId: cart.id 
             };
 
             setUser(userData);

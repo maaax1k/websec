@@ -10,27 +10,25 @@ function ProductDetail() {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-
     const handleAddToCart = async () => {
         setIsAdding(true);
         try {
-            // 1. Получаем данные пользователя из хранилища
+
             const storedUser = localStorage.getItem('user');
 
-            // 2. Проверяем наличие данных
+
             if (!storedUser) {
                 console.error("Пользователь не авторизован");
                 setIsAdding(false);
-                // Тут можно добавить navigate('/login') или уведомление
+
                 return;
             }
 
-            // 3. Достаем cartId
+
             const { cartId } = JSON.parse(storedUser);
 
-            // 4. Делаем запрос с динамическим ID
             const response = await api.post('/cart-items/', {
-                cart: cartId, // Подставляем ID из памяти
+                cart: cartId,
                 product_id: product.id,
                 quantity: 1
             });
@@ -158,9 +156,9 @@ function ProductDetail() {
                                     )}
                                 </div>
                             </button>
-                            <button className='flex-1 border border-neutral-200 hover:bg-neutral-50 text-neutral-800 font-bold py-4 rounded-xl transition-colors cursor-pointer text-sm uppercase'>
+                            {/* <button className='flex-1 border border-neutral-200 hover:bg-neutral-50 text-neutral-800 font-bold py-4 rounded-xl transition-colors cursor-pointer text-sm uppercase'>
                                 Buy Now
-                            </button>
+                            </button> */}
                         </div>
 
                         <div className='border-t border-neutral-100 pt-6'>

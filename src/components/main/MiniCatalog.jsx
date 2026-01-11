@@ -7,15 +7,13 @@ function MiniCatalog() {
     const [isLoading, setIsLoading] = useState(true)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [itemsPerSlide, setItemsPerSlide] = useState(4)
-    const [addingId, setAddingId] = useState(null); // хранит ID товара, который в процессе добавления
+    const [addingId, setAddingId] = useState(null); 
     const addToCart = async (productId) => {
         setAddingId(productId);
 
         try {
-            // 1. Достаем данные пользователя из localStorage
-            const storedUser = localStorage.getItem('user');
 
-            // 2. Проверяем, есть ли данные, и извлекаем cartId
+            const storedUser = localStorage.getItem('user');
             if (!storedUser) {
                 console.error("Пользователь не авторизован");
                 return;
@@ -23,9 +21,8 @@ function MiniCatalog() {
 
             const { cartId } = JSON.parse(storedUser);
 
-            // 3. Отправляем запрос с динамическим cartId
             const response = await api.post('/cart-items/', {
-                cart: cartId, // Используем полученный ID
+                cart: cartId, 
                 product_id: productId,
                 quantity: 1
             });
@@ -79,7 +76,6 @@ function MiniCatalog() {
         setCurrentIndex((prev) => (prev > 0 ? prev - 1 : slidesCount - 1));
     }
 
-    // Компонент скелетона
     const SkeletonCard = () => (
         <div
             className='rounded-lg mx-2 p-3 animate-pulse shrink-0'

@@ -23,8 +23,6 @@ function User() {
         setAccessToken(null);
         localStorage.removeItem('user');
         navigate('/login');
-        // Reload можно оставить, если хочешь гарантированно сбросить 
-        // состояние всех компонентов, но с setAccessToken(null) это уже не обязательно
         // window.location.reload(); 
     }
 };

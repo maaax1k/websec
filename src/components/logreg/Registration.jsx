@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'; // Импортируем хук
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import api from '../../api/axios';
 
 
@@ -25,21 +25,16 @@ function Register() {
 
     setLoading(true);
     try {
-      // 1. Пытаемся получить токен
       const token = await executeRecaptcha('register_page');
 
       if (!token) {
         throw new Error("Google не вернул токен. Проверьте Site Key и Домены.");
       }
 
-      // 2. Явно собираем объект для отправки
       const dataToSend = {
         ...formData,
         re_captcha_token: token
       };
-
-      console.log("Отправляем данные:", dataToSend); // Проверьте консоль перед запросом
-
       const response = await api.post('/auth/register/', dataToSend);
       setMessage(response.data.detail);
     } catch (err) {

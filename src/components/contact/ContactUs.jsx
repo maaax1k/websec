@@ -6,15 +6,14 @@ function ContactUs() {
       }, [])
     return (
         <div className='mx-[10%] my-10 bg-white rounded-2xl shadow-lg text-neutral-800 animate-fadeIn overflow-hidden border border-neutral-100'>
-            {/* Декоративная верхняя часть */}
+
             <div className='bg-neutral-900 p-12 text-white text-center'>
                 <h1 className='text-4xl md:text-5xl font-black tracking-tighter uppercase'>Contact Us</h1>
             </div>
 
             <div className='p-8 md:p-16'>
                 <div className='grid grid-cols-1 lg:grid-cols-3 gap-16 mb-16'>
-                    
-                    {/* Секция: Телефоны */}
+
                     <div className='space-y-8'>
                         <div className='group'>
                             <h4 className='text-[10px] uppercase tracking-[0.3em] text-neutral-400 font-bold mb-3 transition-colors group-hover:text-neutral-900'>Call Center</h4>
@@ -29,7 +28,6 @@ function ContactUs() {
                         </div>
                     </div>
 
-                    {/* Секция: Адреса */}
                     <div className='space-y-10'>
                         <div className='group'>
                             <h4 className='text-[10px] uppercase tracking-[0.3em] text-neutral-400 font-bold mb-3 transition-colors group-hover:text-neutral-900'>Main Office</h4>
@@ -41,7 +39,6 @@ function ContactUs() {
                         </div>
                     </div>
 
-                    {/* Секция: Соцсети */}
                     <div className='space-y-8'>
                         <div>
                             <h4 className='text-[10px] uppercase tracking-[0.3em] text-neutral-400 font-bold mb-4'>Social Media</h4>
@@ -60,7 +57,6 @@ function ContactUs() {
                     </div>
                 </div>
 
-                {/* Блок с Яндекс.Картой */}
                 <div className='rounded-2xl overflow-hidden border border-neutral-100 shadow-inner bg-neutral-50'>
                     <div style={{ position: 'relative', overflow: 'hidden', width: '100%', height: '450px' }}>
                         <a 

@@ -10,10 +10,7 @@ function Products({ products, isLoading }) {
         setAddingId(productId);
 
         try {
-            // 1. Достаем данные пользователя из localStorage
             const storedUser = localStorage.getItem('user');
-
-            // 2. Проверяем, есть ли данные, и извлекаем cartId
             if (!storedUser) {
                 console.error("Пользователь не авторизован");
                 return;
@@ -21,9 +18,8 @@ function Products({ products, isLoading }) {
 
             const { cartId } = JSON.parse(storedUser);
 
-            // 3. Отправляем запрос с динамическим cartId
             const response = await api.post('/cart-items/', {
-                cart: cartId, // Используем полученный ID
+                cart: cartId, 
                 product_id: productId,
                 quantity: 1
             });
