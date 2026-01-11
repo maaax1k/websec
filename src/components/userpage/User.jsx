@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import api from '../../api/axios';
-import { useAuth } from '../../context/AuthContext';
+import api, { setAccessToken } from '../../api/axios';
 
 
 function User() {
@@ -9,59 +8,72 @@ function User() {
         window.scrollTo(0, 0);
     }, [])
     const navigate = useNavigate();
-    const { user, logout, checkAuth, loading: authLoading } = useAuth();
-
+    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-
+    const [userData, setUserData] = useState({ id: '', first_name: '', last_name: '', email: '' });
     const [editForm, setEditForm] = useState({ first_name: '', last_name: '' });
-    useEffect(() => {
-        window.scrollTo(0, 0);
-        if (user) {
-            setEditForm({
-                first_name: user.first_name || '',
-                last_name: user.last_name || ''
-            });
-        }
-    }, [user]);
-    useEffect(() => {
-        if (!authLoading && !user) {
-            navigate('/login');
-        }
-    }, [user, authLoading, navigate]);
-
     const handleLogout = async () => {
+    try {
+        await api.post('/auth/logout/');
+    } catch (err) {
+        console.error("Logout error", err);
+    } finally {
+        setAccessToken(null);
+        localStorage.removeItem('user');
+        navigate('/login');
+        // window.location.reload(); 
+    }
+};
+    const getUserData = async () => {
         try {
-            await api.post('/auth/logout/');
+            const res = await api.get('/auth/me/');
+
+            const { user, cart } = res.data;
+            const finalUserData = {
+                ...user,
+                cartId: cart.id
+            };
+
+            setUserData(finalUserData);
+            setEditForm({
+                first_name: user.first_name,
+                last_name: user.last_name
+            });
+
+            setIsLoading(false);
         } catch (err) {
-            console.error("Logout error", err);
-        } finally {
-            logout();
-            navigate('/login');
+            if (err.response?.status === 401) {
+                navigate('/');
+            }
+            setIsLoading(false);
         }
     };
-    
+
+    useEffect(() => {
+        getUserData();
+    }, [navigate]);
+
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await api.patch('/auth/me/', {
+            const res = await api.patch('/auth/me/', {
                 first_name: editForm.first_name,
                 last_name: editForm.last_name
             });
-            
-            await checkAuth(); 
-            
+            setUserData(res.data);
             setIsEditing(false);
         } catch (err) {
-            console.error("Ошибка при обновлении:", err);
             alert("Не удалось сохранить данные");
         } finally {
             setIsSaving(false);
+            getUserData();
+            window.location.reload();
         }
     };
 
-    if (authLoading || !user) {
+    if (isLoading) {
         return (
             <div className="min-h-[80vh] bg-gray-100 flex items-center justify-center p-4">
                 <div className="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
@@ -92,7 +104,7 @@ function User() {
                 <div className="bg-neutral-800 p-6">
                     <div className="flex items-center space-x-4">
                         <div className="h-16 w-16 bg-neutral-200 rounded-full flex items-center justify-center text-neutral-700 text-2xl font-bold uppercase">
-                            {user.first_name?.[0]}{user.last_name?.[0]}
+                            {userData.first_name?.[0]}{userData.last_name?.[0]}
                         </div>
                         <div>
                             <h2 className="text-white text-xl font-bold">Личный кабинет</h2>
@@ -117,7 +129,7 @@ function User() {
                             />
                         ) : (
                             <p className="mt-1 text-lg text-gray-900 font-semibold border-b border-gray-100 pb-2">
-                                {user.first_name || 'Не указано'}
+                                {userData.first_name || 'Не указано'}
                             </p>
                         )}
                     </div>
@@ -133,7 +145,7 @@ function User() {
                             />
                         ) : (
                             <p className="mt-1 text-lg text-gray-900 font-semibold border-b border-gray-100 pb-2">
-                                {user.last_name || 'Не указано'}
+                                {userData.last_name || 'Не указано'}
                             </p>
                         )}
                     </div>
@@ -141,7 +153,7 @@ function User() {
                     <div>
                         <label className="block text-sm font-medium text-gray-500 uppercase tracking-wider">Email адрес</label>
                         <p className="mt-1 text-lg text-yellow-600 font-medium border-b border-gray-100 pb-2 opacity-70">
-                            {user.email}
+                            {userData.email}
                         </p>
                     </div>
 
@@ -158,7 +170,7 @@ function User() {
                                 <button
                                     onClick={() => {
                                         setIsEditing(false);
-                                        setEditForm({ first_name: user.first_name, last_name: user.last_name });
+                                        setEditForm({ first_name: userData.first_name, last_name: userData.last_name });
                                     }}
                                     className="w-full cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-xl transition duration-200"
                                 >

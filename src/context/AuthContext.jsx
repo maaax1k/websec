@@ -9,21 +9,20 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuth = useCallback(async () => {
         try {
+ 
+            const refresh = await api.post('/auth/refresh/');
+            setAccessToken(refresh.data.access);
+
             const res = await api.get('/auth/me/');
-            const { user, cart } = res.data;
-            const userData = { ...user, cartId: cart.id };
-            
+            const userData = { ...res.data.user, cartId: res.data.cart?.id };
             setUser(userData);
-            localStorage.setItem('user', JSON.stringify(userData));
         } catch (err) {
+            console.log("Session not found or expired");
             setUser(null);
-            localStorage.removeItem('user');
-            setAccessToken(null);
         } finally {
-            setLoading(false);
+            setLoading(false); 
         }
     }, []);
-
 
     useEffect(() => {
         checkAuth();
@@ -31,16 +30,12 @@ export const AuthProvider = ({ children }) => {
 
     const login = (data) => {
         setAccessToken(data.access);
-        const userData = data.user;
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        checkAuth();
+        setUser(data.user);
     };
 
     const logout = () => {
         setUser(null);
         setAccessToken(null);
-        localStorage.removeItem('user');
     };
 
     return (

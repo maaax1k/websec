@@ -1,16 +1,40 @@
 import cart from '/cart.png'
 import userIcon from '../assets/user.png' 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom'
+import api from '../api/axios'; 
 
 function Header() {
-  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  // const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const checkAuth = async () => {
+        try {
+            const res = await api.get('/auth/me/');
+
+            const { user, cart } = res.data;
+
+            const userData = {
+                ...user, 
+                cartId: cart.id 
+            };
+
+            setUser(userData);
+            localStorage.setItem('user', JSON.stringify(userData));
+
+        } catch (err) {
+            if (err.response?.status === 401) {
+                setUser(null);
+                localStorage.removeItem('user');
+            }
+        }
+    };
+
+    checkAuth();
+
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -41,11 +65,16 @@ function Header() {
 
 
         {user ? (
-          <Link to="/user" className="p-2 rounded text-lg hover:bg-neutral-100 h-14 w-14 flex items-center justify-center">
-            {user.first_name?.[0]}<span className='text-yellow-500'>{user.last_name?.[0]}</span>
+          
+          <div className="flex items-center le">
+            <Link to="/user" className="p-2 rounded text-lg hover:bg-neutral-100 cursor-pointer h-14 w-14 flex items-center justify-center">
+            {user.first_name[0]}<span className='text-yellow-500'>{user.last_name[0]}</span>
           </Link>
+            
+            
+          </div>
         ) : (
-          <Link to="/login" className="p-2 rounded hover:bg-neutral-100">
+          <Link to="/login" className="p-2 rounded hover:bg-neutral-100 cursor-pointer">
             <img src={userIcon} alt="user" className="size-8 md:size-10" />
           </Link>
         )}
