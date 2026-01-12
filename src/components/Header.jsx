@@ -3,38 +3,14 @@ import userIcon from '../assets/user.png'
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/axios'; 
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
+  const { user } = useAuth(); 
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
-        try {
-            const res = await api.get('/auth/me/');
-
-            const { user, cart } = res.data;
-
-            const userData = {
-                ...user, 
-                cartId: cart.id 
-            };
-
-            setUser(userData);
-            localStorage.setItem('user', JSON.stringify(userData));
-
-        } catch (err) {
-            if (err.response?.status === 401) {
-                setUser(null);
-                localStorage.removeItem('user');
-            }
-        }
-    };
-
-    checkAuth();
-
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);

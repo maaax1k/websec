@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuth = useCallback(async () => {
         try {
- 
+
             const refresh = await api.post('/auth/refresh/');
             setAccessToken(refresh.data.access);
 
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
             console.log("Session not found or expired");
             setUser(null);
         } finally {
-            setLoading(false); 
+            setLoading(false);
         }
     }, []);
 
@@ -31,7 +31,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = (data) => {
         setAccessToken(data.access);
-        setUser(data.user);
+        const userData = { ...data.user, cartId: data.cart?.id };
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
     };
 
     const logout = () => {

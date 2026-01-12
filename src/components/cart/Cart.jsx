@@ -7,7 +7,6 @@ function Cart() {
     const [isLoading, setIsLoading] = useState(true);
     const [isAuth, setIsAuth] = useState(!!localStorage.getItem('user'));
 
-
     useEffect(() => {
         window.scrollTo(0, 0);
         if (isAuth) {
@@ -19,8 +18,7 @@ function Cart() {
 
     const [shippingAddress, setShippingAddress] = useState('');
     const [isOrdering, setIsOrdering] = useState(false);
-    const [statusMsg, setStatusMsg] = useState({ type: '', text: '' }); // Для вывода ошибок/успеха
-
+    const [statusMsg, setStatusMsg] = useState({ type: '', text: '' }); 
     const handleCreateOrder = async () => {
         setStatusMsg({ type: '', text: '' });
 
@@ -36,7 +34,6 @@ function Cart() {
             });
 
             setStatusMsg({ type: 'success', text: 'Заказ успешно оформлен!' });
-
             setTimeout(() => {
                 setCartItems([]);
                 setShippingAddress('');
@@ -53,7 +50,6 @@ function Cart() {
     const fetchCart = async () => {
         try {
             const res = await api.get('/cart-items/');
-            // ИСПРАВЛЕНО: Добавлен мапинг данных, который был потерян
             const initializedItems = res.data.map(item => ({
                 ...item,
                 total_item_price: (parseFloat(item.product.price) * item.quantity).toString()
@@ -69,31 +65,24 @@ function Cart() {
             setIsLoading(false);
         }
     };
-    // Оптимизированное удаление
     const removeItem = async (id) => {
-        // 1. Сохраняем копию на случай ошибки
         const previousItems = [...cartItems];
-
-        // 2. Мгновенно обновляем UI
         setCartItems(prev => prev.filter(item => item.id !== id));
 
         try {
             await api.delete(`/cart-items/${id}/`);
         } catch (err) {
-            // 3. Если ошибка — возвращаем как было
             console.error("Не удалось удалить", err);
             setCartItems(previousItems);
             alert("Ошибка при удалении товара");
         }
     };
 
-    // Оптимизированное изменение количества
     const updateQuantity = async (id, newQty) => {
         if (newQty < 1) return;
 
         const previousItems = [...cartItems];
 
-        // 1. Мгновенно меняем состояние в UI
         setCartItems(prev => prev.map(item =>
             item.id === id ? {
                 ...item,
@@ -103,10 +92,9 @@ function Cart() {
         ));
 
         try {
-            // 2. Отправляем запрос в фоне
+
             await api.patch(`/cart-items/${id}/`, { quantity: newQty });
         } catch (err) {
-            // 3. Откат при ошибке
             console.error("Ошибка обновления", err);
             setCartItems(previousItems);
         }
@@ -125,7 +113,6 @@ function Cart() {
             <h1 className="text-4xl font-black mb-10 tracking-tighter">Shopping Cart</h1>
 
             {!isAuth ? (
-                /* КЕЙС: ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН */
                 <div className="bg-neutral-50 rounded-[3rem] p-20 text-center border border-neutral-100 shadow-inner">
                     <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
                         <svg className="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +169,6 @@ function Cart() {
                                         </div>
 
                                         <div className="flex items-center justify-between mt-8">
-                                            {/* Контроллер количества */}
                                             <div className="flex items-center bg-neutral-50 rounded-full border border-neutral-100 p-1">
                                                 <button
                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -204,12 +190,10 @@ function Cart() {
                             ))}
                         </div>
 
-                        {/* Summary Panel */}
                         <div className="lg:w-[380px]">
                             <div className="bg-neutral-900 text-white rounded-[2.5rem] p-10 sticky top-25 shadow-2xl">
                                 <h2 className="text-2xl font-bold tracking-tighter mb-8 border-b border-neutral-800 pb-6">Checkout</h2>
 
-                                {/* Поле адреса */}
                                 <div className="mb-6">
                                     <label className="text-neutral-500 uppercase text-[10px] font-bold tracking-widest block mb-3">
                                         Shipping Address
@@ -218,7 +202,7 @@ function Cart() {
                                         value={shippingAddress}
                                         onChange={(e) => {
                                             setShippingAddress(e.target.value);
-                                            if (statusMsg.text) setStatusMsg({ type: '', text: '' }); // Убираем ошибку при наборе
+                                            if (statusMsg.text) setStatusMsg({ type: '', text: '' }); 
                                         }}
                                         placeholder="City, Street, Building..."
                                         className={`w-full bg-neutral-800 border rounded-xl p-4 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-all resize-none h-24
@@ -226,7 +210,6 @@ function Cart() {
                                     />
                                 </div>
 
-                                {/* Блок сообщений (вместо алертов) */}
                                 {statusMsg.text && (
                                     <div className={`mb-6 text-[11px] font-bold uppercase tracking-wider p-3 rounded-lg text-center animate-pulse
                 ${statusMsg.type === 'error' ? 'text-red-400 bg-red-400/10' : 'text-green-400 bg-green-400/10'}`}>
@@ -235,7 +218,6 @@ function Cart() {
                                 )}
 
                                 <div className="space-y-4 mb-10">
-                                    {/* Твои Subtotal, Shipping, Total */}
                                     <div className="flex justify-between text-neutral-500 uppercase text-[10px] font-bold tracking-widest">
                                         <span>Subtotal</span>
                                         <span className="text-white">{totalPrice.toLocaleString()} ₸</span>

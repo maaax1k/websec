@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api, { setAccessToken } from '../../api/axios';
+import { useAuth } from '../../context/AuthContext';
 
 function Login() {
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -12,27 +14,20 @@ function Login() {
     const [isSuccess, setIsSuccess] = useState(false);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoggingIn(true);
-        setError('');
-
-        try {
-            const response = await api.post('/auth/login/', { email, password });
-            setAccessToken(response.data.access);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            setIsLoggingIn(false);
-            setIsSuccess(true);
-
-            setTimeout(() => {
-                navigate('/');
-                window.location.reload();
-            }, 800);
-
-        } catch (err) {
-            setIsLoggingIn(false);
-            setError(err.response?.data?.detail || 'Ошибка при входе');
-        }
-    };
+    e.preventDefault();
+    setIsLoggingIn(true);
+    try {
+        const response = await api.post('/auth/login/', { email, password });
+        login(response.data); 
+        
+        setIsSuccess(true);
+        setTimeout(() => navigate('/'), 800); 
+    } catch (err) {
+        setError('Ошибка входа');
+    } finally {
+        setIsLoggingIn(false);
+    }
+};
 
     return (
         <div className="min-h-[70vh] flex items-center justify-center">
