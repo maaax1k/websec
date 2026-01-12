@@ -17,11 +17,10 @@ import Orders from './components/orders/Orders'
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { AuthProvider,useAuth } from './context/AuthContext';
 
-// App.js
 function App() {
   return (
     <div className='mt-30'>
-      <GoogleReCaptchaProvider reCaptchaKey="KEY">
+      <GoogleReCaptchaProvider reCaptchaKey="6LdrV0YsAAAAAG4Bh_QZZYNZlbJaJspHLLCjIFvE">
         <AuthProvider>
           <AuthWrapper />
         </AuthProvider>
@@ -43,7 +42,6 @@ function AuthWrapper() {
 
   return (
     <div className='mt-30'>
-      <GoogleReCaptchaProvider reCaptchaKey="6LdrV0YsAAAAAG4Bh_QZZYNZlbJaJspHLLCjIFvE">
         <BrowserRouter>
           <Header />
           <Routes>
@@ -60,7 +58,6 @@ function AuthWrapper() {
           </Routes>
           <Footer />
         </BrowserRouter>
-      </GoogleReCaptchaProvider>
     </div>
   )
 }
